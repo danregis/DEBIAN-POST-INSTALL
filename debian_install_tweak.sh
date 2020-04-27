@@ -9,66 +9,45 @@
 # | OS             | Test | Last test   |
 # |----------------|------|-------------|
 # | Debian 10.3    | OK   | 10 Mar 2020 |
-# |                | OK   | 10 Mar 2020 |
-# |                | OK   | 10 Mar 2020 |
-# |                | OK   | 10 Mar 2020 |
-# |                | OK   | 10 Mar 2020 |
-# |                | OK   | 10 Mar 2020 |
-
 
 print_help {
          echo "Please make sure of your selections -- they are unreversible"
          echo "This will update, install and tweak your debian install"
          }
 
+########Modifying Repo ###################################
 
+#sed '/deb/s/$/ non-free/' /etc/apt/sources.list
 
-# 1. KEEP UBUNTU OR DEBIAN UP TO DATE
+echo deb http://deb.debian.org/debian/ buster main contrib non-free >/etc/apt/sources.list
+echo deb-src http://deb.debian.org/debian/ buster main > /etc/apt/sources.list
 
-########SELECT FASTEST REPO ###################################
-echo "Setting fastest mirror, Please wait..."
+echo deb http://security.debian.org/debian-security buster/updates main contrib non-free > /etc/apt/sources.list
+echo deb-src http://security.debian.org/debian-security buster/updates main > /etc/apt/sources.list
 
-sudo apt-get -y install apt-get install netselect-ap
+echo deb http://deb.debian.org/debian/ buster-updates main contrib non-free > /etc/apt/sources.list
+echo deb-src http://deb.debian.org/debian/ buster-updates main > /etc/apt/sources.list
 
-mv /etc/apt/sources.list /etc/apt/sources.list.bak
-
-sudo netselect-apt
-
-sed '/deb/s/$/ non-free/' /etc/apt/sources.list
-
-#echo deb http://deb.debian.org/debian/ buster main contrib non-free >
-/etc/apt/sources.list
-#echo deb-src http://deb.debian.org/debian/ buster main >
-/etc/apt/sources.list
-
-#echo deb http://security.debian.org/debian-security buster/updates main
-contrib non-free > /etc/apt/sources.list
-#echo deb-src http://security.debian.org/debian-security buster/updates
-main > /etc/apt/sources.list
-
-#echo deb http://deb.debian.org/debian/ buster-updates main contrib
-non-free > /etc/apt/sources.list
-#echo deb-src http://deb.debian.org/debian/ buster-updates main >
-/etc/apt/sources.list
+#add backports here
 
 ################################################################
 echo "updating, upgrading, Please waite..."
 
-sudo apt-get -y clean                                # REMOVE UPDATE DB
-sudo apt-get -y autoclean                            # REMOVE NOT UNUSED PACKAGES
-sudo apt-get -y autoremove                           # REMOVE DEB INSTALL FILES
-sudo apt-get -y update                               # UPDATE LATEST PKG
-sudo apt-get -y upgrade                              # UPGRADE PKG
-sudo apt-get -y dist-upgrade                         # UPGRADE DISTRIBUTION
+sudo apt -y clean                                # REMOVE UPDATE DB
+sudo apt -y autoclean                            # REMOVE NOT UNUSED PACKAGES
+sudo apt -y autoremove                           # REMOVE DEB INSTALL FILES
+sudo apt -y update                               # UPDATE LATEST PKG
+sudo apt -y upgrade                              # UPGRADE PKG
+sudo apt -y dist-upgrade                         # UPGRADE DISTRIBUTION
 
 ################################################################
 
 # 1.5 INSTALL FIRMWARE AND MICROCODE
 
-sudo apt-get -y install firmware-misc-nonfree
-sudo apt-get -y install intel-microcode
-sudo apt-get -y install iucode-tool
-sudo apt-get -y install ttf-mscorefonts-installer rar unrar libavcodec-extra gstreamer1.0-libav gstreamer1.0-plugins-ugly gstreamer1.0-vaapi
+sudo apt -y install firmware-misc-nonfree
+sudo apt -y install intel-microcode
+sudo apt -y install iucode-tool
+sudo apt -y install ttf-mscorefonts-installer rar unrar libavcodec-extra gstreamer1.0-libav gstreamer1.0-plugins-ugly gstreamer1.0-vaapi
 
 ################################################################
 
@@ -77,37 +56,37 @@ sudo apt-get -y install ttf-mscorefonts-installer rar unrar libavcodec-extra gst
 echo "we will install software, Interactive (I) or you Trust us (T) or
 get List (L) ?"
 
-sudo apt-get install -y build-essential cmake                              # DEVELOPMENT TOOLS
-sudo apt-get install -y p7zip p7zip-full unrar-free unzip                  # FILE ARCHIVERS
-sudo apt-get install -y htop lshw wget locate curl htop net-tools rsync    # UTILITIES
-sudo apt-get install -y tmux                                               # TERMINAL MULTIPLEXER
-sudo apt-get install -y nano                                               # TEXT EDITORS
-sudo apt-get install -y git                                                # VCS
-sudo apt-get install -y okular                                             # PDF MANIPULATION
-sudo apt-get install -y ffmpeg                                             # VIDEO MANIPULATION
-sudo apt-get install -y default-jdk                                        # JAVA DEVELOPMENT KIT (JDK)
-sudo apt-get install -y wavemon                                            # NET ONLY FOR Wireless
+sudo apt -y install build-essential cmake                              # DEVELOPMENT TOOLS
+sudo apt -y install p7zip p7zip-full unrar-free unzip                  # FILE ARCHIVERS
+sudo apt -y install htop lshw wget locate curl htop net-tools rsync    # UTILITIES
+sudo apt -y install tmux                                               # TERMINAL MULTIPLEXER
+sudo apt -y install nano                                               # TEXT EDITORS
+sudo apt -y install git                                                # VCS
+sudo apt -y install okular                                             # PDF MANIPULATION
+sudo apt -y install ffmpeg                                             # VIDEO MANIPULATION
+sudo apt -y install default-jdk                                        # JAVA DEVELOPMENT KIT (JDK)
+sudo apt -y install wavemon                                            # NET ONLY FOR Wireless
 
 
 ###############################################################
 
 # 3. GUI SOFTWARE
 
-sudo apt-get install -y gparted                                                 # PARTITION TOOL
-sudo apt-get install -y gvfs-backends ntfs-3g                                   # USERSPACE VIRTUAL FILESYSTEM
-sudo apt-get install -y xarchiver                                               # FILE ARCHIVER FRONTEND
-sudo apt-get install -y galculator                                              # SCIENTIFIC CALCULATOR
-sudo apt-get install -y vlc                                                     # VIDEO AND AUDIO PLAYER
+sudo apt -y install gparted                                                 # PARTITION TOOL
+sudo apt -y install gvfs-backends ntfs-3g                                   # USERSPACE VIRTUAL FILESYSTEM
+sudo apt -y install xarchiver                                               # FILE ARCHIVER FRONTEND
+sudo apt -y install galculator                                              # SCIENTIFIC CALCULATOR
+sudo apt -y install vlc                                                     # VIDEO AND AUDIO PLAYER
 #sudo apt-get install -y vscode studio                                          # TEXT EDITOR
 #wget https://go.microsoft.com/fwlink/?LinkID=760868                            # vscode studio
-sudo apt-get install -y blender imagemagick inkscape                            # GRAPHICS EDITORS
-sudo apt-get install -y gimp gimp-data gimp-plugin-registry gimp-data-extras -y # GIMP WTH EXTRAS
-sudo apt-get install -y audacity                                                # AUDIO EDITOR
-sudo apt-get install -y openshot                                                # VIDEO EDITOR
-sudo apt-get install -y filezilla                                               # FTP/FTPS/SFTP CLIENT
-sudo apt-get install -y libreoffice                                             # OFFICE (optional, not last version)
-sudo apt-get install -y google-chrome-stable
-sudo apt-get install -y kazam                                                   # SCREENCAST (optional)
+sudo apt -y install blender imagemagick inkscape                            # GRAPHICS EDITORS
+sudo apt -y install gimp gimp-data gimp-plugin-registry gimp-data-extras -y # GIMP WTH EXTRAS
+sudo apt -y install audacity                                                # AUDIO EDITOR
+sudo apt -y install openshot                                                # VIDEO EDITOR
+sudo apt -y install filezilla                                               # FTP/FTPS/SFTP CLIENT
+sudo apt -y install libreoffice                                             # OFFICE (optional, not last version)
+sudo apt -y install google-chrome-stable
+sudo apt -y install kazam                                                   # SCREENCAST (optional)
 
 ###############################################################
 
@@ -122,11 +101,13 @@ sudo apt-get install -y kazam                                                   
 
 # 4. SERVICES
 
-sudo apt-get install -y ufw                                                      # firewall
+sudo apt -y install ufw                                                      # firewall
 sudo systemctl start ufw
 sudo systemctl enable ufw
 
-sudo apt-get install tlp                                                         # battery saver
+
+#ask if a laptop
+sudo apt -y install tlp                                                         # battery saver
 sudo systemctl start tlp
 sudo systemctl enable tlp
 
@@ -137,8 +118,6 @@ sudo systemctl enable tlp
 
 sudo sysctl vm.swappiness=10                                                    # SET SWAPINESS
 sudo hdparm -W 1 /dev/sda                                                       # SET DISK CACHE ON
-
-
 
 #set grub
 
