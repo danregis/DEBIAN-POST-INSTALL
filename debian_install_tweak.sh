@@ -17,7 +17,8 @@ print_help {
 
 ########Modifying Repo ###################################
 
-#sed '/deb/s/$/ non-free/' /etc/apt/sources.list
+repo_mod () {
+     #sed '/deb/s/$/ non-free/' /etc/apt/sources.list
 
 echo deb http://deb.debian.org/debian/ buster main contrib non-free >/etc/apt/sources.list
 echo deb-src http://deb.debian.org/debian/ buster main > /etc/apt/sources.list
@@ -28,10 +29,15 @@ echo deb-src http://security.debian.org/debian-security buster/updates main > /e
 echo deb http://deb.debian.org/debian/ buster-updates main contrib non-free > /etc/apt/sources.list
 echo deb-src http://deb.debian.org/debian/ buster-updates main > /etc/apt/sources.list
 
-#add backports here
+echo deb http://deb.debian.org/debian buster-backports main > /etc/apt/sources.list
+}
 
 ################################################################
 echo "updating, upgrading, Please waite..."
+
+function_name () {
+<commands>
+}
 
 sudo apt -y clean                                # REMOVE UPDATE DB
 sudo apt -y autoclean                            # REMOVE NOT UNUSED PACKAGES
@@ -39,6 +45,7 @@ sudo apt -y autoremove                           # REMOVE DEB INSTALL FILES
 sudo apt -y update                               # UPDATE LATEST PKG
 sudo apt -y upgrade                              # UPGRADE PKG
 sudo apt -y dist-upgrade                         # UPGRADE DISTRIBUTION
+sudo logrotate -vf /etc/logrotate.conf           # Force Rotate logs
 
 ################################################################
 
@@ -66,6 +73,7 @@ sudo apt -y install okular                                             # PDF MAN
 sudo apt -y install ffmpeg                                             # VIDEO MANIPULATION
 sudo apt -y install default-jdk                                        # JAVA DEVELOPMENT KIT (JDK)
 sudo apt -y install wavemon                                            # NET ONLY FOR Wireless
+sudo apt -y install speetest-CLI                                       # Speed test tool
 
 
 ###############################################################
@@ -77,8 +85,6 @@ sudo apt -y install gvfs-backends ntfs-3g                                   # US
 sudo apt -y install xarchiver                                               # FILE ARCHIVER FRONTEND
 sudo apt -y install galculator                                              # SCIENTIFIC CALCULATOR
 sudo apt -y install vlc                                                     # VIDEO AND AUDIO PLAYER
-#sudo apt-get install -y vscode studio                                          # TEXT EDITOR
-#wget https://go.microsoft.com/fwlink/?LinkID=760868                            # vscode studio
 sudo apt -y install blender imagemagick inkscape                            # GRAPHICS EDITORS
 sudo apt -y install gimp gimp-data gimp-plugin-registry gimp-data-extras -y # GIMP WTH EXTRAS
 sudo apt -y install audacity                                                # AUDIO EDITOR
@@ -88,12 +94,17 @@ sudo apt -y install libreoffice                                             # OF
 sudo apt -y install google-chrome-stable
 sudo apt -y install kazam                                                   # SCREENCAST (optional)
 
+wget https://go.microsoft.com/fwlink/?LinkID=760868 -p /opt/visualtmp/      ## vscode studio
+dpkg -i /opt/visualtmp/*.deb
+apt -y get install -f
+
 ###############################################################
 
 # 3.5 INSTALL VIDEO DRIVERS
 
 #Determine if we have nvidia or amd
-#
+
+lshw -numeric -C display | grep vendor
 #get nvidia deb
 #get amd deb
 
@@ -107,7 +118,9 @@ sudo systemctl enable ufw
 
 
 #ask if a laptop
-sudo apt -y install tlp                                                         # battery saver
+
+echo 'Is this a laptop ?'
+sudo apt -y install tlp                                                      # battery saver
 sudo systemctl start tlp
 sudo systemctl enable tlp
 
@@ -116,8 +129,8 @@ sudo systemctl enable tlp
 
 # 5. TWEAKS
 
-sudo sysctl vm.swappiness=10                                                    # SET SWAPINESS
-sudo hdparm -W 1 /dev/sda                                                       # SET DISK CACHE ON
+sudo sysctl vm.swappiness=10                                                 # SET SWAPINESS
+sudo hdparm -W 1 /dev/sda                                                    # SET DISK CACHE ON
 
 #set grub
 
