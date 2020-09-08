@@ -1,81 +1,37 @@
-# Post install to debian 
+# Debian post install mods
 
-Was tired of adding repos and options after install, so decided to create this small script that will:
+Was tired of adding repos and options after install, so decided to create a small bash script that will:
 
-This is just a small script to install basic, default stuff for debian Buster...
-
-Disclaimer:
-
-This is a work in progress;
-
-Use at your own risk as this is not specific to any hardware
-
-
-#### License
-[MIT](https://choosealicense.com/licenses/mit/)
-
-*danregis (c) 2020*
-
-
-# Project Title
-
-Simple overview of use/purpose.
-
-## Description
-
-An in-depth paragraph about your project and overview of use.
-
-## Getting Started
-
-### Dependencies
-
-* Describe any prerequisites, libraries, OS version, etc., needed before installing program.
-* ex. Windows 10
+This is just to install basic, default stuff for debian Buster...
 
 ### Installing
 
-* How/where to download your program
-* Any modifications needed to be made to files/folders
+* just git clone the repo
 
 ### Executing program
 
-* How to run the program
-* Step-by-step bullets
-```
-code blocks for commands
-```
-
-## Help
-
-Any advise for common problems or issues.
-```
-command to run if program contains helper info
-```
+* chmod +x debian-post-install.sh
+* ./debian-post-install.sh
 
 ## Authors
 
 Contributors names and contact info
 
-ex. Dominique Pizzie  
-ex. [@DomPizzie](https://twitter.com/dompizzie)
+Dan Regis (dregis@gmail.com)
 
 ## Version History
 
-* 0.2
-    * Various bug fixes and optimizations
-    * See [commit change]() or See [release history]()
-* 0.1
+* 1.0
     * Initial Release
 
 ## License
 
-This project is licensed under the [NAME HERE] License - see the LICENSE.md file for details
+This project is licensed under the [MIT] License - see the LICENSE.md file for details
 
-## Acknowledgments
+## Disclaimer
 
-Inspiration, code snippets, etc.
-* [awesome-readme](https://github.com/matiassingers/awesome-readme)
-* [PurpleBooth](https://gist.github.com/PurpleBooth/109311bb0361f32d87a2)
-* [dbader](https://github.com/dbader/readme-template)
-* [zenorocha](https://gist.github.com/zenorocha/4526327)
-* [fvcproductions](https://gist.github.com/fvcproductions/1bfc2d4aecb01a834b46)
+
+This is a work in progress;
+
+Use at your own risk as this is not specific to any hardware
+
