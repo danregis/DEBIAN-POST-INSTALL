@@ -24,7 +24,7 @@ print_help {
 
 #need to determine which distro is used (for now debian is by default)
 
-repo_mod () {
+#repo_mod () {
      #sed '/deb/s/$/ non-free/' /etc/apt/sources.list
 
 echo deb http://deb.debian.org/debian/ buster main contrib non-free >/etc/apt/sources.list
@@ -71,8 +71,7 @@ sudo apt -y install ttf-mscorefonts-installer rar unrar libavcodec-extra gstream
 
 # 2. CLI SOFTWARE
 
-echo "we will install software, Interactive (I) or you Trust us (T) or
-get List (L) ?"
+cli_install () {
 
 sudo apt -y install build-essential cmake                              # DEVELOPMENT TOOLS
 sudo apt -y install p7zip p7zip-full unrar-free unzip                  # FILE ARCHIVERS
@@ -85,6 +84,7 @@ sudo apt -y install ffmpeg                                             # VIDEO M
 sudo apt -y install default-jdk                                        # JAVA DEVELOPMENT KIT (JDK)
 sudo apt -y install wavemon                                            # NET ONLY FOR Wireless
 sudo apt -y install speetest-CLI                                       # Speed test tool
+}
 
 ###############################################################
 
@@ -104,7 +104,7 @@ sudo apt -y install audacity                                                # AU
 sudo apt -y install openshot                                                # VIDEO EDITOR
 sudo apt -y install filezilla                                               # FTP/FTPS/SFTP CLIENT
 sudo apt -y install libreoffice                                             # OFFICE (optional, not last version)
-#sudo apt -y install google-chrome-stable
+sudo apt -y install firefox
 sudo apt -y install kazam                                                   # SCREENCAST (optional)
 sudo apt -y lshw                                                            # Information about hardware configuration 
 }
@@ -124,9 +124,13 @@ apt-get install -f
 
 #Determine if we have nvidia or amd
 
-lshw -numeric -C display | grep vendor
-#get nvidia deb
-#get amd deb
+video = $(lshw -numeric -C display | grep vendor)
+
+if [ "$video" == "nvidia" ]; then
+     sudo apt-get install nvidia
+elif [ "$1" == "amd" ]; then
+     sudo apt-get install amd
+fi
 
 ###############################################################
 
