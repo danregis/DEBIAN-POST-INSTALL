@@ -115,10 +115,13 @@ sudo apt -y lshw                                                            # In
 
 # 3.2 Install some .deb packages
 
+deb_install () {
+
 wget https://github.com/VSCodium/vscodium/releases/download/1.48.2/codium_1.48.2-1598439200_amd64.deb -O /opt/  #visual studio code foos version
 cd /opt/
 dpkg -i codium*.deb
 apt-get install -f 
+}
 
 ###############################################################
 
@@ -128,10 +131,14 @@ apt-get install -f
 
 video = $(lshw -numeric -C display | grep vendor)
 
-if [ "$video" == "nvidia" ]; then
-     sudo apt-get install nvidia
+if [ "$video" == "nvidia" ];
+     sudo add-apt-repository ppa:graphics-drivers/ppa -y
+     sudo apt update
+     sudo apt install nvidia-driver
 elif [ "$1" == "amd" ]; then
-     sudo apt-get install amd
+     sudo add-apt-repository ppa:oibaf/graphics-drivers -y
+     sudo apt update
+     sudo apt install amdgpu-pro
 fi
 
 ###############################################################
@@ -160,18 +167,21 @@ esac
 
 # 5. TWEAKS
 
-sudo sysctl vm.swappiness=10                                                 # SET SWAPINESS
+sudo echo /etc/sysctl.conf >> vm.swappiness=10                               # Set swappiness
+
 sudo hdparm -W 1 /dev/sda                                                    # SET DISK CACHE ON
 
 #remove time stamp on fstab
 
+# /etc/fstab add noatime after ro
+
 #set grub
 
-nano /etc/default/grub
+#nano /etc/default/grub
 
-GRUB_TIMEOUT to 0
+#GRUB_TIMEOUT to 0
 
-update-grub
+#update-grub
 
 #################################################################
 
