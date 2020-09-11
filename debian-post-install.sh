@@ -15,6 +15,7 @@
 # |----------------|------|-------------|
 
 ###############################################################
+
 print_help {
          echo "Please make sure of your selections -- they are unreversible"
          echo "This will update, install and tweak your debian install"
@@ -24,8 +25,8 @@ print_help {
 
 #need to determine which distro is used (for now debian is by default)
 
-#repo_mod () {
-     #sed '/deb/s/$/ non-free/' /etc/apt/sources.list
+repo_mod () {
+#sed '/deb/s/$/ non-free/' /etc/apt/sources.list
 
 echo deb http://deb.debian.org/debian/ buster main contrib non-free >/etc/apt/sources.list
 echo deb-src http://deb.debian.org/debian/ buster main > /etc/apt/sources.list
@@ -40,19 +41,20 @@ echo deb http://deb.debian.org/debian buster-backports main > /etc/apt/sources.l
 }
 
 ################################################################
-echo "updating, upgrading, Please waite..."
 
-main_update () {
+echo "updating, upgrading, Please be patient..."
 
-sudo apt -y clean                                # REMOVE UPDATE DB
-sudo apt -y autoclean                            # REMOVE NOT UNUSED PACKAGES
-sudo apt -y autoremove                           # REMOVE DEB INSTALL FILES
-sudo apt -y update                               # UPDATE LATEST PKG
-sudo apt -y upgrade                              # UPGRADE PKG
-sudo apt -y dist-upgrade                         # UPGRADE DISTRIBUTION
-sudo logrotate -vf /etc/logrotate.conf           # Force Rotate logs
-}
-
+#create a /bin file for auto updates
+touch /bin/update
+cat /bin/update  > sudo apt -y clean                        # REMOVE UPDATE DB
+cat /bin/update  >> sudo apt -y autoclean                   # REMOVE NOT UNUSED PACKAGES
+cat /bin/update  >> sudo apt -y autoremove                  # REMOVE DEB INSTALL FILES
+cat /bin/update  >> sudo apt update                         # UPDATE LATEST PKG
+cat /bin/update  >> sudo apt -y upgrade                     # UPGRADE PKG
+cat /bin/update  >> sudo apt -y dist-upgrade                # UPGRADE DISTRIBUTION
+cat /bin/update  >> sudo logrotate -vf /etc/logrotate.conf  # Force Rotate logs
+sudo chmod +x /bin/update
+sh ./update
 
 ################################################################
 
