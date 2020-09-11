@@ -85,7 +85,7 @@ sudo apt -y install speetest-CLI                                       # Speed t
 
 # 3. GUI SOFTWARE
 
-soft_install () {
+gui_install () {
 
 sudo apt -y install gparted                                                 # PARTITION TOOL
 sudo apt -y install gvfs-backends ntfs-3g                                   # USERSPACE VIRTUAL FILESYSTEM
@@ -179,25 +179,25 @@ sudo hdparm -W 1 /dev/sda                                                    # S
 #################################################################
 
 if [ "$1" == "Add_Repo" ]; then
-     run_usage1
+     repo_mod
 elif [ "$1" == "Updates" ]; then
-     run_usage2
+     
 elif [ "$1" == "Firmware" ]; then
-     run_usage3
+     firmware_update
 elif [ "$1" == "CLI_Soft" ]; then
-     run_usage3
+     cli_install
 elif [ "$1" == "GUI_Soft" ]; then
-     run_usage3
+     gui_install
 elif [ "$1" == "DEB_pkg" ]; then
-     run_usage3
+     deb_install
 elif [ "$1" == "GPU_Drivers" ]; then
-     run_usage3
+     
 elif [ "$1" == "Firewall" ]; then
-     run_usage3
+     
 elif [ "$1" == "Laptop" ]; then
-     run_usage3
+     
 elif [ "$1" == "Tweaks" ]; then
-     run_usage3
+     
 else
      echo "Usage: $0 Add_Repo|Updates|Firmware|CLI_Soft|GUI_Soft|DEB_pkg|GPU_Drivers|Firewall|Laptop|Tweaks"
      echo " Add Repo: adds repos from debian contrib non-free"
