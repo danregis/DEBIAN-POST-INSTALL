@@ -8,18 +8,11 @@
 # |-------------------------------------|
 # | OS             | Test | Last test   |
 # |----------------|------|-------------|
-# | Debian 10.3    |  OK  | 10 Mar 2020 |
+# | Debian 10.3    |  OK  | 10 Mar 2020 | modified since
 # |                |      |             |
 # |                |      |             |
 # |                |      |             |
 # |----------------|------|-------------|
-
-###############################################################
-
-print_help {
-         echo "Please make sure of your selections -- they are unreversible"
-         echo "This will update, install and tweak your debian install"
-         }
 
 ########Modifying Repo ########################################
 
@@ -29,15 +22,15 @@ repo_mod () {
 #sed '/deb/s/$/ non-free/' /etc/apt/sources.list
 
 echo deb http://deb.debian.org/debian/ buster main contrib non-free >/etc/apt/sources.list
-echo deb-src http://deb.debian.org/debian/ buster main > /etc/apt/sources.list
+echo deb-src http://deb.debian.org/debian/ buster main >> /etc/apt/sources.list
 
-echo deb http://security.debian.org/debian-security buster/updates main contrib non-free > /etc/apt/sources.list
-echo deb-src http://security.debian.org/debian-security buster/updates main > /etc/apt/sources.list
+echo deb http://security.debian.org/debian-security buster/updates main contrib non-free >> /etc/apt/sources.list
+echo deb-src http://security.debian.org/debian-security buster/updates main >> /etc/apt/sources.list
 
-echo deb http://deb.debian.org/debian/ buster-updates main contrib non-free > /etc/apt/sources.list
-echo deb-src http://deb.debian.org/debian/ buster-updates main > /etc/apt/sources.list
+echo deb http://deb.debian.org/debian/ buster-updates main contrib non-free >> /etc/apt/sources.list
+echo deb-src http://deb.debian.org/debian/ buster-updates main >> /etc/apt/sources.list
 
-echo deb http://deb.debian.org/debian buster-backports main > /etc/apt/sources.list
+echo deb http://deb.debian.org/debian buster-backports main >> /etc/apt/sources.list
 }
 
 ################################################################
@@ -147,7 +140,7 @@ fi
 
 read -p "would you like to activate firewall (y/n)?" choice
 case "$choice" in 
-  y|Y ) sudo apt -y install ufw; systemctl start ufw; systemctl enable ufw;; # Firewall
+  y|Y ) echo "activating firewall...";sudo apt -y install ufw; systemctl start ufw; systemctl enable ufw;; # Firewall
   n|N ) echo "Ok, continuing...";;
   * ) echo "invalid";;
 esac
@@ -158,7 +151,7 @@ esac
 
 read -p "Is this a laptop (y/n)?" choice
 case "$choice" in 
-  y|Y ) sudo apt -y install tlp; systemctl start tlp; systemctl enable tlp;; # batt saver
+  y|Y ) echo "installing Batt. saver...";sudo apt -y install tlp; systemctl start tlp; systemctl enable tlp;; # batt saver
   n|N ) echo "Ok, continuing....";;
   * ) echo "invalid";;
 esac
@@ -185,14 +178,38 @@ sudo hdparm -W 1 /dev/sda                                                    # S
 
 #################################################################
 
-if [ "$1" == "usage1" ]; then
+if [ "$1" == "Add_Repo" ]; then
      run_usage1
-elif [ "$1" == "usage2" ]; then
+elif [ "$1" == "Updates" ]; then
      run_usage2
+elif [ "$1" == "Firmware" ]; then
+     run_usage3
+elif [ "$1" == "CLI_Soft" ]; then
+     run_usage3
+elif [ "$1" == "GUI_Soft" ]; then
+     run_usage3
+elif [ "$1" == "DEB_pkg" ]; then
+     run_usage3
+elif [ "$1" == "GPU_Drivers" ]; then
+     run_usage3
+elif [ "$1" == "Firewall" ]; then
+     run_usage3
+elif [ "$1" == "Laptop" ]; then
+     run_usage3
+elif [ "$1" == "Tweaks" ]; then
+     run_usage3
 else
-     echo "Usage: $0 usage1|usage2"
-     echo " usage1: does something"
-     echo " usage2: does something too"
+     echo "Usage: $0 Add_Repo|Updates|Firmware|CLI_Soft|GUI_Soft|DEB_pkg|GPU_Drivers|Firewall|Laptop|Tweaks"
+     echo " Add Repo: adds repos from debian contrib non-free"
+     echo " Updates: will create an update script you can call from any terminal"
+     echo " Firmware: install firmware needed"
+     echo " CLI_Soft: install terminal essential apps" 
+     echo " GUI_Soft: install graphical essential apps" 
+     echo " DEB_pkg: install debian pkg needed" 
+     echo " GPU_Drivers: install GPU drivers nvidia/amd"
+     echo " Firewall: install firewall and activates it" 
+     echo " Laptop: install battery saver"
+     echo " Tweaks: install a couple of tweaks to speed up your computer" 
 fi
 
 exit 0
