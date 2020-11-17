@@ -68,17 +68,17 @@ sudo apt -y install ttf-mscorefonts-installer rar unrar libavcodec-extra gstream
 
 cli_install () {
 
-sudo apt -y install build-essential cmake                              # DEVELOPMENT TOOLS
-sudo apt -y install p7zip p7zip-full unrar-free unzip                  # FILE ARCHIVERS
-sudo apt -y install htop lshw wget locate curl htop net-tools rsync    # UTILITIES
-sudo apt -y install tmux                                               # TERMINAL MULTIPLEXER
-sudo apt -y install nano                                               # TEXT EDITORS
-sudo apt -y install git                                                # VCS
-sudo apt -y install okular                                             # PDF MANIPULATION
-sudo apt -y install ffmpeg                                             # VIDEO MANIPULATION
-sudo apt -y install default-jdk                                        # JAVA DEVELOPMENT KIT (JDK)
-sudo apt -y install wavemon                                            # NET ONLY FOR Wireless
-sudo apt -y install speetest-CLI                                       # Speed test tool
+sudo apt -y install build-essential cmake                                   # DEVELOPMENT TOOLS
+sudo apt -y install p7zip p7zip-full unrar-free unzip                       # FILE ARCHIVERS
+sudo apt -y install htop lshw wget locate curl htop net-tools rsync cssh    # UTILITIES
+sudo apt -y install tmux                                                    # TERMINAL MULTIPLEXER
+sudo apt -y install nano                                                    # TEXT EDITORS
+sudo apt -y install git                                                     # VCS
+sudo apt -y install okular                                                  # PDF MANIPULATION
+sudo apt -y install ffmpeg                                                  # VIDEO MANIPULATION
+sudo apt -y install default-jdk                                             # JAVA DEVELOPMENT KIT (JDK)
+sudo apt -y install wavemon                                                 # NET ONLY FOR Wireless
+sudo apt -y install speetest-CLI                                            # Speed test tool
 }
 
 ###############################################################
@@ -133,6 +133,8 @@ elif [ "$1" == "amd" ]; then
      sudo apt update
      sudo apt install amdgpu-pro
 fi
+#need to catch exception
+
 
 ###############################################################
 
