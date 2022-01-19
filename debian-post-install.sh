@@ -39,15 +39,15 @@ echo "updating, upgrading, Please be patient..."
 
 #create a /bin file for auto updates
 touch /bin/update
-cat /bin/update  > sudo apt -y clean                        # REMOVE UPDATE DB
-cat /bin/update  >> sudo apt -y autoclean                   # REMOVE NOT UNUSED PACKAGES
-cat /bin/update  >> sudo apt -y autoremove                  # REMOVE DEB INSTALL FILES
-cat /bin/update  >> sudo apt update                         # UPDATE LATEST PKG
-cat /bin/update  >> sudo apt -y upgrade                     # UPGRADE PKG
-cat /bin/update  >> sudo apt -y dist-upgrade                # UPGRADE DISTRIBUTION
-cat /bin/update  >> sudo logrotate -vf /etc/logrotate.conf  # Force Rotate logs
-sudo chmod +x /bin/update
-sh ./update
+echo "apt -y clean" > /bin/update                        # REMOVE UPDATE DB
+echo "apt -y autoclean" >> cat /bin/update               # REMOVE NOT UNUSED PACKAGES
+echo "apt -y autoremove" >>  /bin/update                 # REMOVE DEB INSTALL FILES
+echo "apt update" >> /bin/update                         # UPDATE LATEST PKG
+echo "apt -y upgrade" >> /bin/update                     # UPGRADE PKG
+echo "apt -y dist-upgrade" >> /bin/update                # UPGRADE DISTRIBUTION
+echo "logrotate -vf /etc/logrotate.conf" >> /bin/update  # Force Rotate logs
+chmod +x /bin/update
+sh /bin/./update
 
 ################################################################
 
@@ -122,17 +122,17 @@ apt-get install -f
 
 #Determine if we have nvidia or amd
 
-video = $(lshw -numeric -C display | grep vendor)
+##video = $(lshw -numeric -C display | grep vendor)
 
-if [ "$video" == "nvidia" ];
-     sudo add-apt-repository ppa:graphics-drivers/ppa -y
-     sudo apt update
-     sudo apt install nvidia-driver
-elif [ "$1" == "amd" ]; then
-     sudo add-apt-repository ppa:oibaf/graphics-drivers -y
-     sudo apt update
-     sudo apt install amdgpu-pro
-fi
+##if [ "$video" == "nvidia" ];
+##     sudo add-apt-repository ppa:graphics-drivers/ppa -y
+##     sudo apt update
+##     sudo apt install nvidia-driver
+##elif [ "$1" == "amd" ]; then
+##     sudo add-apt-repository ppa:oibaf/graphics-drivers -y
+##     sudo apt update
+##     sudo apt install amdgpu-pro
+##fi
 #need to catch exception
 
 
@@ -142,7 +142,7 @@ fi
 
 read -p "would you like to activate firewall (y/n)?" choice
 case "$choice" in 
-  y|Y ) echo "activating firewall...";sudo apt -y install ufw; systemctl start ufw; systemctl enable ufw;; # Firewall
+  y|Y ) echo "activating firewall...";apt -y install ufw; systemctl start ufw; systemctl enable ufw;; # Firewall
   n|N ) echo "Ok, continuing...";;
   * ) echo "invalid";;
 esac
@@ -153,7 +153,7 @@ esac
 
 read -p "Is this a laptop (y/n)?" choice
 case "$choice" in 
-  y|Y ) echo "installing Batt. saver...";sudo apt -y install tlp; systemctl start tlp; systemctl enable tlp;; # batt saver
+  y|Y ) echo "installing Batt. saver..."; apt -y install tlp; systemctl start tlp; systemctl enable tlp;; # batt saver
   n|N ) echo "Ok, continuing....";;
   * ) echo "invalid";;
 esac
@@ -162,9 +162,9 @@ esac
 
 # 5. TWEAKS
 
-sudo echo /etc/sysctl.conf >> vm.swappiness=10                               # Set swappiness
+echo /etc/sysctl.conf >> vm.swappiness=10                               # Set swappiness
 
-sudo hdparm -W 1 /dev/sda                                                    # SET DISK CACHE ON
+hdparm -W 1 /dev/sda                                                    # SET DISK CACHE ON
 
 #remove time stamp on fstab
 
@@ -183,7 +183,7 @@ sudo hdparm -W 1 /dev/sda                                                    # S
 if [ "$1" == "Add_Repo" ]; then
      repo_mod
 elif [ "$1" == "Updates" ]; then
-     
+     updates
 elif [ "$1" == "Firmware" ]; then
      firmware_update
 elif [ "$1" == "CLI_Soft" ]; then
@@ -193,13 +193,13 @@ elif [ "$1" == "GUI_Soft" ]; then
 elif [ "$1" == "DEB_pkg" ]; then
      deb_install
 elif [ "$1" == "GPU_Drivers" ]; then
-     
+     GPU
 elif [ "$1" == "Firewall" ]; then
-     
+     firewall
 elif [ "$1" == "Laptop" ]; then
-     
+     laptop
 elif [ "$1" == "Tweaks" ]; then
-     
+     tweaks
 else
      echo "Usage: $0 Add_Repo|Updates|Firmware|CLI_Soft|GUI_Soft|DEB_pkg|GPU_Drivers|Firewall|Laptop|Tweaks"
      echo " Add Repo: adds repos from debian contrib non-free"
