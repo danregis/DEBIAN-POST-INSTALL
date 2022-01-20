@@ -123,20 +123,23 @@ apt update sudo apt install code
 
 #7- INSTALL VIDEO DRIVERS
 
+gpu_drivers () {
+
 #Determine if we have nvidia or amd
 
-##video = $(lshw -numeric -C display | grep vendor)
+video = $(lshw -numeric -C display | grep vendor)
 
-##if [ "$video" == "nvidia" ];
-##     sudo add-apt-repository ppa:graphics-drivers/ppa -y
-##     sudo apt update
-##     sudo apt install nvidia-driver
-##elif [ "$1" == "amd" ]; then
-##     sudo add-apt-repository ppa:oibaf/graphics-drivers -y
-##     sudo apt update
-##     sudo apt install amdgpu-pro
-##fi
+if [ "$video" == "nvidia" ];
+    add-apt-repository ppa:graphics-drivers/ppa -y
+    apt update
+    apt install nvidia-driver
+elif [ "$1" == "amd" ]; then
+    add-apt-repository ppa:oibaf/graphics-drivers -y
+    sudo apt update
+    apt install amdgpu-pro
+fi
 #need to catch exception
+}
 
 ###############################################################
 
@@ -261,7 +264,7 @@ select fav in "${foods[@]}"; do
              echo "Proceed y/n ?"
             read ans
                 if [[ $ans == y* ]]; then
-                    xxxxx
+                    gpu_drivers
                 else
                     echo "Exiting..."
                 fi
@@ -273,7 +276,7 @@ select fav in "${foods[@]}"; do
             echo "Proceed y/n ?"
             read ans
                 if [[ $ans == y* ]]; then
-                    xxxxxx
+                    firewall
                 else
                     echo "Exiting..."
                 fi
@@ -285,7 +288,7 @@ select fav in "${foods[@]}"; do
             echo "Proceed y/n ?"
             read ans
                 if [[ $ans == y* ]]; then
-                    xxxxxx
+                    laptop
                 else
                     echo "Exiting..."
                 fi
