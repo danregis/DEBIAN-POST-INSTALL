@@ -37,7 +37,6 @@ echo deb http://deb.debian.org/debian buster-backports main >> /etc/apt/sources.
 
 ################################################################
 
-
 #2- CREATE AN UPDATE SCRIPT
 
 updates () {
@@ -114,10 +113,10 @@ apt -y lshw                                                            # Informa
 
 deb_install () {
 
-wget https://github.com/VSCodium/vscodium/releases/download/1.48.2/codium_1.48.2-1598439200_amd64.deb -O /opt/  #visual studio code foos version
-cd /opt/
-dpkg -i codium*.deb
-apt-get install -f 
+apt install software-properties-common apt-transport-HTTP curl
+curl -SSL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main"
+apt update sudo apt install code
 }
 
 ###############################################################
@@ -141,46 +140,40 @@ apt-get install -f
 
 ###############################################################
 
-#8- SERVICES
+#8- FIREWALL
 
-#read -p "would you like to activate firewall (y/n)?" choice
-#case "$choice" in 
-#  y|Y ) echo "activating firewall...";apt -y install ufw; systemctl start ufw; systemctl enable ufw;; # Firewall
-#  n|N ) echo "Ok, continuing...";;
-#  * ) echo "invalid";;
-#esac
+firewall () {
+apt -y install ufw; systemctl start ufw; systemctl enable ufw;; # Firewall
+}
 
 ###############################################################
 
-#9- ask if a laptop
+#9- LAPTOP
 
-#read -p "Is this a laptop (y/n)?" choice
-#case "$choice" in 
-#  y|Y ) echo "installing Batt. saver..."; apt -y install tlp; systemctl start tlp; systemctl enable tlp;; # batt saver
-#  n|N ) echo "Ok, continuing....";;
-#  * ) echo "invalid";;
-#esac
+laptop () {
+apt -y install tlp; systemctl start tlp; systemctl enable tlp;; # batt saver
+}
 
 ###############################################################
 
 #10- TWEAKS
 
-#echo /etc/sysctl.conf >> vm.swappiness=10                               # Set swappiness
-
+tweaks () {
+echo /etc/sysctl.conf >> vm.swappiness=10                               # Set swappiness
 #hdparm -W 1 /dev/sda                                                    # SET DISK CACHE ON
 
-#remove time stamp on fstab
+##remove time stamp on fstab
 
 # /etc/fstab add noatime after ro
 
-#set grub
+##set grub
 
 #nano /etc/default/grub
 
 #GRUB_TIMEOUT to 0
 
 #update-grub
-
+}
 
 ###############################################################
 
@@ -192,48 +185,123 @@ select fav in "${foods[@]}"; do
         "Add_Repo")
             echo "$fav: adds repos from debian contrib non-free"
             # optionally call a function or run some code here
+            echo "Proceed y/n ?"
+            read ans
+                if [[ $ans == y* ]]; then
+                    add_repo
+                else
+                    echo "Exiting..."
+                fi
+            break
             add_repo 
             ;;
         "Updates")
             echo "$fav: will create an update script called update you can call from any terminal"
             # optionally call a function or run some code here
-            updates
+            echo "Proceed y/n ?"
+            read ans
+                if [[ $ans == y* ]]; then
+                    updates
+                else
+                    echo "Exiting..."
+                fi
+            break
             ;;
         "Firmware")
             echo "$fav: install firmware needed"
             # optionally call a function or run some code here
-            firmware
+            echo "Proceed y/n ?"
+            read ans
+                if [[ $ans == y* ]]; then
+                    firmware
+                else
+                    echo "Exiting..."
+                fi
+            break
             ;;
         "CLI_Soft")
             echo "$fav: install terminal essential apps"
             # optionally call a function or run some code here
-            cli_install
+            echo "Proceed y/n ?"
+            read ans
+                if [[ $ans == y* ]]; then
+                    cli_install
+                else
+                    echo "Exiting..."
+                fi
+            break
             ;;
         "GUI_Soft")
             echo "$fav: install graphical essential apps"
             # optionally call a function or run some code here
-            gui_install
+            echo "Proceed y/n ?"
+            read ans
+                if [[ $ans == y* ]]; then
+                    gui_install
+                else
+                    echo "Exiting..."
+                fi
+            break
             ;;
         "DEB_pkg")
             echo "$fav: install debian pkg needed"
             # optionally call a function or run some code here
-            deb_install
+            echo "Proceed y/n ?"
+            read ans
+                if [[ $ans == y* ]]; then
+                    deb_install
+                else
+                    echo "Exiting..."
+                fi
+            break
             ;;
         "GPU_Drivers")
             echo "$fav: install GPU drivers nvidia/amd"
             # optionally call a function or run some code here
+             echo "Proceed y/n ?"
+            read ans
+                if [[ $ans == y* ]]; then
+                    xxxxx
+                else
+                    echo "Exiting..."
+                fi
+            break
             ;;
         "Firewall")
             echo "$fav: install firewall and activates it"
             # optionally call a function or run some code here
+            echo "Proceed y/n ?"
+            read ans
+                if [[ $ans == y* ]]; then
+                    xxxxxx
+                else
+                    echo "Exiting..."
+                fi
+            break
             ;;
         "Laptop")
             echo "$fav: install battery saver"
             # optionally call a function or run some code here
+            echo "Proceed y/n ?"
+            read ans
+                if [[ $ans == y* ]]; then
+                    xxxxxx
+                else
+                    echo "Exiting..."
+                fi
+            break
             ;;
          "Tweaks")
             echo "$fav: install a couple of tweaks to speed up your computer"
             # optionally call a function or run some code here
+            echo "Proceed y/n ?"
+            read ans
+                if [[ $ans == y* ]]; then
+                    xxxxx
+                else
+                    echo "Exiting..."
+                fi
+            break
             ;;
         "Quit")
             echo "User requested exit"

@@ -8,17 +8,19 @@
 # |-------------------------------------|
 # | OS             | Test | Last test   |
 # |----------------|------|-------------|
-# | Debian 10.3    |  OK  | 10 Mar 2020 | modified since
+# | Debian 10.3    |  OK  | 19 Jan 2022 | modified since
 # |                |      |             |
 # |                |      |             |
 # |                |      |             |
 # |----------------|------|-------------|
 
-########Modifying Repo ########################################
+########Declare Function########################################
+
+#1-ADD REPOS
 
 #need to determine which distro is used (for now debian is by default)
 
-repo_mod () {
+add_repo () {
 #sed '/deb/s/$/ non-free/' /etc/apt/sources.list
 
 echo deb http://deb.debian.org/debian/ buster main contrib non-free >/etc/apt/sources.list
@@ -35,9 +37,10 @@ echo deb http://deb.debian.org/debian buster-backports main >> /etc/apt/sources.
 
 ################################################################
 
-echo "updating, upgrading, Please be patient..."
+#2- CREATE AN UPDATE SCRIPT
 
-#create a /bin file for auto updates
+updates () {
+
 touch /bin/update
 echo "apt -y clean" > /bin/update                        # REMOVE UPDATE DB
 echo "apt -y autoclean" >> cat /bin/update               # REMOVE NOT UNUSED PACKAGES
@@ -48,77 +51,77 @@ echo "apt -y dist-upgrade" >> /bin/update                # UPGRADE DISTRIBUTION
 echo "logrotate -vf /etc/logrotate.conf" >> /bin/update  # Force Rotate logs
 chmod +x /bin/update
 sh /bin/./update
-
-################################################################
-
-# 1.5 INSTALL FIRMWARE AND MICROCODE
-
-
-firmware_update () {
-
-sudo apt -y install firmware-misc-nonfree
-sudo apt -y install intel-microcode
-sudo apt -y install iucode-tool
-sudo apt -y install ttf-mscorefonts-installer rar unrar libavcodec-extra gstreamer1.0-libav gstreamer1.0-plugins-ugly gstreamer1.0-vaapi
 }
 
 ################################################################
 
-# 2. CLI SOFTWARE
+#3- INSTALL FIRMWARE AND MICROCODE
+
+firmware () {
+
+apt -y install firmware-misc-nonfree
+apt -y install intel-microcode
+apt -y install iucode-tool
+apt -y install ttf-mscorefonts-installer rar unrar libavcodec-extra gstreamer1.0-libav gstreamer1.0-plugins-ugly gstreamer1.0-vaapi
+}
+
+################################################################
+
+#4- CLI SOFTWARE
 
 cli_install () {
 
-sudo apt -y install build-essential cmake                                   # DEVELOPMENT TOOLS
-sudo apt -y install p7zip p7zip-full unrar-free unzip                       # FILE ARCHIVERS
-sudo apt -y install htop lshw wget locate curl htop net-tools rsync cssh    # UTILITIES
-sudo apt -y install tmux                                                    # TERMINAL MULTIPLEXER
-sudo apt -y install nano                                                    # TEXT EDITORS
-sudo apt -y install git                                                     # VCS
-sudo apt -y install okular                                                  # PDF MANIPULATION
-sudo apt -y install ffmpeg                                                  # VIDEO MANIPULATION
-sudo apt -y install default-jdk                                             # JAVA DEVELOPMENT KIT (JDK)
-sudo apt -y install wavemon                                                 # NET ONLY FOR Wireless
-sudo apt -y install speetest-CLI                                            # Speed test tool
+apt -y install build-essential cmake                                   # DEVELOPMENT TOOLS
+apt -y install p7zip p7zip-full unrar-free unzip                       # FILE ARCHIVERS
+apt -y install htop lshw wget locate curl htop net-tools rsync cssh    # UTILITIES
+apt -y install tmux                                                    # TERMINAL MULTIPLEXER
+apt -y install nano                                                    # TEXT EDITORS
+apt -y install git                                                     # VCS
+apt -y install okular                                                  # PDF MANIPULATION
+apt -y install ffmpeg                                                  # VIDEO MANIPULATION
+apt -y install default-jdk                                             # JAVA DEVELOPMENT KIT (JDK)
+apt -y install wavemon                                                 # NET ONLY FOR Wireless
+apt -y install speetest-CLI                                            # Speed test tool
 }
 
 ###############################################################
 
-# 3. GUI SOFTWARE
+#5- GUI SOFTWARE
 
 gui_install () {
 
-sudo apt -y install gparted                                                 # PARTITION TOOL
-sudo apt -y install gvfs-backends ntfs-3g                                   # USERSPACE VIRTUAL FILESYSTEM
-sudo apt -y install xarchiver                                               # FILE ARCHIVER FRONTEND
-sudo apt -y install galculator                                              # SCIENTIFIC CALCULATOR
-sudo apt -y install vlc                                                     # VIDEO AND AUDIO PLAYER
-sudo apt -y install mpv                                                     # VIDEO AND AUDIO PLAYER
-sudo apt -y install blender imagemagick inkscape                            # GRAPHICS EDITORS
-sudo apt -y install gimp gimp-data gimp-plugin-registry gimp-data-extras -y # GIMP WTH EXTRAS
-sudo apt -y install audacity                                                # AUDIO EDITOR
-sudo apt -y install openshot                                                # VIDEO EDITOR
-sudo apt -y install filezilla                                               # FTP/FTPS/SFTP CLIENT
-sudo apt -y install libreoffice                                             # OFFICE (optional, not last version)
-sudo apt -y install firefox
-sudo apt -y install kazam                                                   # SCREENCAST (optional)
-sudo apt -y lshw                                                            # Information about hardware configuration 
+apt -y install gparted                                                 # PARTITION TOOL
+apt -y install gvfs-backends ntfs-3g                                   # USERSPACE VIRTUAL FILESYSTEM
+apt -y install xarchiver                                               # FILE ARCHIVER FRONTEND
+apt -y install galculator                                              # SCIENTIFIC CALCULATOR
+apt -y install vlc                                                     # VIDEO AND AUDIO PLAYER
+apt -y install mpv                                                     # VIDEO AND AUDIO PLAYER
+apt -y install blender imagemagick inkscape                            # GRAPHICS EDITORS
+apt -y install gimp gimp-data gimp-plugin-registry gimp-data-extras -y # GIMP WTH EXTRAS
+apt -y install audacity                                                # AUDIO EDITOR
+apt -y install openshot                                                # VIDEO EDITOR
+apt -y install filezilla                                               # FTP/FTPS/SFTP CLIENT
+apt -y install libreoffice                                             # OFFICE (optional, not last version)
+apt -y install firefox
+apt -y install kazam                                                   # SCREENCAST (optional)
+apt -y lshw                                                            # Information about hardware configuration 
 }
 
 ###############################################################
 
-# 3.2 Install some .deb packages
+#6- INSTALL .DEB PACKAGES
 
 deb_install () {
 
-wget https://github.com/VSCodium/vscodium/releases/download/1.48.2/codium_1.48.2-1598439200_amd64.deb -O /opt/  #visual studio code foos version
-cd /opt/
-dpkg -i codium*.deb
-apt-get install -f 
+apt install software-properties-common apt-transport-HTTP curl
+curl -SSL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main"
+apt update sudo apt install code
 }
 
 ###############################################################
 
-# 3.5 INSTALL VIDEO DRIVERS
+#7- INSTALL VIDEO DRIVERS
 
 #Determine if we have nvidia or amd
 
@@ -135,83 +138,177 @@ apt-get install -f
 ##fi
 #need to catch exception
 
+###############################################################
+
+#8- FIREWALL
+
+firewall () {
+apt -y install ufw; systemctl start ufw; systemctl enable ufw;; # Firewall
+}
 
 ###############################################################
 
-# 4. SERVICES
+#9- LAPTOP
 
-read -p "would you like to activate firewall (y/n)?" choice
-case "$choice" in 
-  y|Y ) echo "activating firewall...";apt -y install ufw; systemctl start ufw; systemctl enable ufw;; # Firewall
-  n|N ) echo "Ok, continuing...";;
-  * ) echo "invalid";;
-esac
+laptop () {
+apt -y install tlp; systemctl start tlp; systemctl enable tlp;; # batt saver
+}
 
 ###############################################################
 
-#ask if a laptop
+#10- TWEAKS
 
-read -p "Is this a laptop (y/n)?" choice
-case "$choice" in 
-  y|Y ) echo "installing Batt. saver..."; apt -y install tlp; systemctl start tlp; systemctl enable tlp;; # batt saver
-  n|N ) echo "Ok, continuing....";;
-  * ) echo "invalid";;
-esac
-
-##############################################################
-
-# 5. TWEAKS
-
+tweaks () {
 echo /etc/sysctl.conf >> vm.swappiness=10                               # Set swappiness
+#hdparm -W 1 /dev/sda                                                    # SET DISK CACHE ON
 
-hdparm -W 1 /dev/sda                                                    # SET DISK CACHE ON
-
-#remove time stamp on fstab
+##remove time stamp on fstab
 
 # /etc/fstab add noatime after ro
 
-#set grub
+##set grub
 
 #nano /etc/default/grub
 
 #GRUB_TIMEOUT to 0
 
 #update-grub
+}
 
-#################################################################
+###############################################################
 
-if [ "$1" == "Add_Repo" ]; then
-     repo_mod
-elif [ "$1" == "Updates" ]; then
-     updates
-elif [ "$1" == "Firmware" ]; then
-     firmware_update
-elif [ "$1" == "CLI_Soft" ]; then
-     cli_install
-elif [ "$1" == "GUI_Soft" ]; then
-     gui_install
-elif [ "$1" == "DEB_pkg" ]; then
-     deb_install
-elif [ "$1" == "GPU_Drivers" ]; then
-     GPU
-elif [ "$1" == "Firewall" ]; then
-     firewall
-elif [ "$1" == "Laptop" ]; then
-     laptop
-elif [ "$1" == "Tweaks" ]; then
-     tweaks
-else
-     echo "Usage: $0 Add_Repo|Updates|Firmware|CLI_Soft|GUI_Soft|DEB_pkg|GPU_Drivers|Firewall|Laptop|Tweaks"
-     echo " Add Repo: adds repos from debian contrib non-free"
-     echo " Updates: will create an update script you can call from any terminal"
-     echo " Firmware: install firmware needed"
-     echo " CLI_Soft: install terminal essential apps" 
-     echo " GUI_Soft: install graphical essential apps" 
-     echo " DEB_pkg: install debian pkg needed" 
-     echo " GPU_Drivers: install GPU drivers nvidia/amd"
-     echo " Firewall: install firewall and activates it" 
-     echo " Laptop: install battery saver"
-     echo " Tweaks: install a couple of tweaks to speed up your computer" 
-fi
 
-exit 0
+PS3='Make your selection: '
+foods=("Add_Repo" "Updates" "Firmware" "CLI_Soft" "GUI_Soft" "DEB_pkg" "GPU_Drivers" "Firewall" "Laptop" "Tweaks" "Quit")
+select fav in "${foods[@]}"; do
+    case $fav in
+        "Add_Repo")
+            echo "$fav: adds repos from debian contrib non-free"
+            # optionally call a function or run some code here
+            echo "Proceed y/n ?"
+            read ans
+                if [[ $ans == y* ]]; then
+                    add_repo
+                else
+                    echo "Exiting..."
+                fi
+            break
+            add_repo 
+            ;;
+        "Updates")
+            echo "$fav: will create an update script called update you can call from any terminal"
+            # optionally call a function or run some code here
+            echo "Proceed y/n ?"
+            read ans
+                if [[ $ans == y* ]]; then
+                    updates
+                else
+                    echo "Exiting..."
+                fi
+            break
+            ;;
+        "Firmware")
+            echo "$fav: install firmware needed"
+            # optionally call a function or run some code here
+            echo "Proceed y/n ?"
+            read ans
+                if [[ $ans == y* ]]; then
+                    firmware
+                else
+                    echo "Exiting..."
+                fi
+            break
+            ;;
+        "CLI_Soft")
+            echo "$fav: install terminal essential apps"
+            # optionally call a function or run some code here
+            echo "Proceed y/n ?"
+            read ans
+                if [[ $ans == y* ]]; then
+                    cli_install
+                else
+                    echo "Exiting..."
+                fi
+            break
+            ;;
+        "GUI_Soft")
+            echo "$fav: install graphical essential apps"
+            # optionally call a function or run some code here
+            echo "Proceed y/n ?"
+            read ans
+                if [[ $ans == y* ]]; then
+                    gui_install
+                else
+                    echo "Exiting..."
+                fi
+            break
+            ;;
+        "DEB_pkg")
+            echo "$fav: install debian pkg needed"
+            # optionally call a function or run some code here
+            echo "Proceed y/n ?"
+            read ans
+                if [[ $ans == y* ]]; then
+                    deb_install
+                else
+                    echo "Exiting..."
+                fi
+            break
+            ;;
+        "GPU_Drivers")
+            echo "$fav: install GPU drivers nvidia/amd"
+            # optionally call a function or run some code here
+             echo "Proceed y/n ?"
+            read ans
+                if [[ $ans == y* ]]; then
+                    xxxxx
+                else
+                    echo "Exiting..."
+                fi
+            break
+            ;;
+        "Firewall")
+            echo "$fav: install firewall and activates it"
+            # optionally call a function or run some code here
+            echo "Proceed y/n ?"
+            read ans
+                if [[ $ans == y* ]]; then
+                    xxxxxx
+                else
+                    echo "Exiting..."
+                fi
+            break
+            ;;
+        "Laptop")
+            echo "$fav: install battery saver"
+            # optionally call a function or run some code here
+            echo "Proceed y/n ?"
+            read ans
+                if [[ $ans == y* ]]; then
+                    xxxxxx
+                else
+                    echo "Exiting..."
+                fi
+            break
+            ;;
+         "Tweaks")
+            echo "$fav: install a couple of tweaks to speed up your computer"
+            # optionally call a function or run some code here
+            echo "Proceed y/n ?"
+            read ans
+                if [[ $ans == y* ]]; then
+                    xxxxx
+                else
+                    echo "Exiting..."
+                fi
+            break
+            ;;
+        "Quit")
+            echo "User requested exit"
+            exit
+            ;;
+        *) echo "invalid option $REPLY";;
+
+
+esac
+done
