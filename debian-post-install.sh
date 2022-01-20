@@ -135,7 +135,7 @@ if [ "$video" == "nvidia" ];
     apt install nvidia-driver
 elif [ "$1" == "amd" ]; then
     add-apt-repository ppa:oibaf/graphics-drivers -y
-    sudo apt update
+    apt update
     apt install amdgpu-pro
 fi
 #need to catch exception
@@ -163,13 +163,15 @@ apt -y install tlp; systemctl start tlp; systemctl enable tlp;; # batt saver
 
 tweaks () {
 echo /etc/sysctl.conf >> vm.swappiness=10                               # Set swappiness
-#hdparm -W 1 /dev/sda                                                    # SET DISK CACHE ON
+
+## need to find drive name
+#hdparm -W 1 /dev/sda                                                   # SET DISK CACHE ON
 
 ##remove time stamp on fstab
 
 # /etc/fstab add noatime after ro
 
-##set grub
+##set grub  ***Need to make a backup of grub before mods******
 
 #nano /etc/default/grub
 
