@@ -6,7 +6,7 @@
 
 # | THIS SCRIPT IS TESTED CORRECTLY ON  |
 # |-------------------------------------|
-# | OS             | Test | Last test   |
+# | OS             | Test | Last test   |test
 # |----------------|------|-------------|
 # | Debian 10.3    |  OK  | 19 Jan 2022 | modified since
 # |                |      |             |
