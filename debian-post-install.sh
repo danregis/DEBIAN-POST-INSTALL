@@ -35,6 +35,7 @@ echo deb-src http://deb.debian.org/debian/ buster-updates main >> /etc/apt/sourc
 echo deb http://deb.debian.org/debian buster-backports main >> /etc/apt/sources.list
 }
 
+just a test
 ################################################################
 
 #2- CREATE AN UPDATE SCRIPT
