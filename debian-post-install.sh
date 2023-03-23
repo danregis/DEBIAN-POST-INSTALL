@@ -14,7 +14,7 @@
 # |                |      |             |
 # |----------------|------|-------------|
 
-########Declare Function########################################
+#Declare Function
 
 #1-ADD REPOS
 
@@ -35,8 +35,6 @@ echo deb-src http://deb.debian.org/debian/ buster-updates main >> /etc/apt/sourc
 echo deb http://deb.debian.org/debian buster-backports main >> /etc/apt/sources.list
 }
 
-################################################################
-
 #2- CREATE AN UPDATE SCRIPT
 
 updates () {
@@ -53,8 +51,6 @@ chmod +x /bin/update
 sh /bin/./update
 }
 
-################################################################
-
 #3- INSTALL FIRMWARE AND MICROCODE
 
 firmware () {
@@ -64,8 +60,6 @@ apt -y install intel-microcode
 apt -y install iucode-tool
 apt -y install ttf-mscorefonts-installer rar unrar libavcodec-extra gstreamer1.0-libav gstreamer1.0-plugins-ugly gstreamer1.0-vaapi
 }
-
-################################################################
 
 #4- CLI SOFTWARE
 
@@ -83,8 +77,6 @@ apt -y install default-jdk                                             # JAVA DE
 apt -y install wavemon                                                 # NET ONLY FOR Wireless
 apt -y install speetest-CLI                                            # Speed test tool
 }
-
-###############################################################
 
 #5- GUI SOFTWARE
 
@@ -107,8 +99,6 @@ apt -y install kazam                                                   # SCREENC
 apt -y lshw                                                            # Information about hardware configuration 
 }
 
-###############################################################
-
 #6- INSTALL .DEB PACKAGES
 
 deb_install () {
@@ -118,8 +108,6 @@ curl -SSL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
 add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main"
 apt update sudo apt install code
 }
-
-###############################################################
 
 #7- INSTALL VIDEO DRIVERS
 
@@ -141,23 +129,17 @@ fi
 #need to catch exception
 }
 
-###############################################################
-
 #8- FIREWALL
 
 firewall () {
 apt -y install ufw; systemctl start ufw; systemctl enable ufw;; # Firewall
 }
 
-###############################################################
-
 #9- LAPTOP
 
 laptop () {
 apt -y install tlp; systemctl start tlp; systemctl enable tlp;; # batt saver
 }
-
-###############################################################
 
 #10- TWEAKS
 
@@ -179,9 +161,6 @@ echo /etc/sysctl.conf >> vm.swappiness=10                               # Set sw
 
 #update-grub
 }
-
-###############################################################
-
 
 PS3='Make your selection: '
 foods=("Add_Repo" "Updates" "Firmware" "CLI_Soft" "GUI_Soft" "DEB_pkg" "GPU_Drivers" "Firewall" "Laptop" "Tweaks" "Quit")
