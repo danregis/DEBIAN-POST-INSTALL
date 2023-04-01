@@ -6,7 +6,7 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 add_repo() {
-    apt update # added to ensure updates to package list are performed
+    apt update
     if ! command -v lsb_release &> /dev/null; then
         echo "lsb-release not found. Installing it now..."
         apt install -y lsb-release
@@ -15,31 +15,25 @@ add_repo() {
     release_codename=$(lsb_release -sc)
 
     cat <<- EOF > /etc/apt/sources.list
-deb http://deb.debian.org/debian/ $release_codename main contrib non-free
-deb-src http://deb.debian.org/debian/ $release_codename main
-deb http://security.debian.org/debian-security $release_codename/updates main contrib non-free
-deb-src http://security.debian.org/debian-security $release_codename/updates main
-deb http://deb.debian.org/debian/ $release_codename-updates main contrib non-free
-deb-src http://deb.debian.org/debian/ $release_codename-updates main
-deb http://deb.debian.org/debian $release_codename-backports main
+        deb http://deb.debian.org/debian/ $release_codename main contrib non-free
+        deb-src http://deb.debian.org/debian/ $release_codename main
+        deb http://security.debian.org/debian-security $release_codename/updates main contrib non-free
+        deb-src http://security.debian.org/debian-security $release_codename/updates main
+        deb http://deb.debian.org/debian/ $release_codename-updates main contrib non-free
+        deb-src http://deb.debian.org/debian/ $release_codename-updates main
+        deb http://deb.debian.org/debian $release_codename-backports main
 EOF
 }
 
-
 updates() {
-    cat <<- EOF > /bin/update
-#!/bin/bash
-apt -y clean
-apt -y autoclean
-apt -y autoremove
-apt update
-apt -y upgrade
-apt -y dist-upgrade
-logrotate -vf /etc/logrotate.conf
-rm $0 # add this line to remove script after execution
-EOF
-    chmod +x /bin/update
-    /bin/update
+    apt -y clean
+    apt -y autoclean
+    apt -y autoremove
+    apt update
+    apt -y upgrade
+    apt -y dist-upgrade
+    logrotate -vf /etc/logrotate.conf
+    rm -f /bin/update
 }
 
 firmware() {
@@ -50,20 +44,20 @@ firmware() {
 
 cli_install() {
     apt -y install build-essential cmake p7zip p7zip-full unrar-free unzip \
-    htop lshw wget locate curl htop net-tools rsync cssh tmux nano git okular \
-    ffmpeg default-jdk wavemon speedtest-cli
+    htop lshw wget locate curl net-tools rsync tmux nano git ffmpeg \
+    default-jdk wavemon speedtest-cli
 }
 
 gui_install() {
-    apt -y install gparted gvfs-backends ntfs-3g xarchiver galculator vlc mpv \
-    blender imagemagick inkscape gimp gimp-data gimp-plugin-registry \
-    gimp-data-extras audacity openshot filezilla libreoffice firefox kazam "lshw"
+    apt -y install gparted galculator vlc mpv blender imagemagick inkscape gimp \
+    gimp-data gimp-plugin-registry gimp-data-extras audacity openshot filezilla \
+    libreoffice firefox
 }
 
 deb_install() {
     apt install -y software-properties-common apt-transport-https curl
     curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
-    add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main"
+    sudo add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main"
     apt update
     apt install -y "code"
 }
@@ -93,6 +87,11 @@ firewall() {
 }
 
 laptop() {
+    if ! command -v tlp &> /dev/null; then
+        echo "tlp not found. Skipping laptop tweaks."
+        return
+    fi
+    
     if [[ $(systemctl is-active tlp) != "active" ]]; then
         apt -y install tlp
         systemctl start tlp
@@ -103,8 +102,8 @@ laptop() {
 }
 
 tweaks() {
-    echo "vm.swappiness=10" >> /etc/sysctl.conf
-    # last option was cut off, so can't say anything about it
+    echo "# vm.swappiness=10" >> /etc/sysctl.conf
+    echo "Tweaks applied: none" # more context should be given
 }
 
 PS3='Make your selection: '
