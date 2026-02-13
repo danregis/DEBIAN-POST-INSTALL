@@ -1,298 +1,373 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-###############################################################
-# INSTALL ADDITIONAL CLI AND GUI SOFTWARE ON UBUNTU OR DEBIAN #
-###############################################################
+set -Eeuo pipefail
 
-# | THIS SCRIPT IS TESTED CORRECTLY ON  |
-# |-------------------------------------|
-# | OS             | Test | Last test   |
-# |----------------|------|-------------|
-# | Debian 10.3    |  OK  | 19 Jan 2022 | modified since
-# |                |      |             |
-# |                |      |             |
-# |                |      |             |
-# |----------------|------|-------------|
+SCRIPT_NAME="$(basename "$0")"
+UPDATE_HELPER="/usr/local/bin/update-system"
 
-#Declare Function
-
-#1-ADD REPOS
-
-#need to determine which distro is used (for now debian is by default)
-
-add_repo () {
-#sed '/deb/s/$/ non-free/' /etc/apt/sources.list
-
-echo deb http://deb.debian.org/debian/ buster main contrib non-free >/etc/apt/sources.list
-echo deb-src http://deb.debian.org/debian/ buster main >> /etc/apt/sources.list
-
-echo deb http://security.debian.org/debian-security buster/updates main contrib non-free >> /etc/apt/sources.list
-echo deb-src http://security.debian.org/debian-security buster/updates main >> /etc/apt/sources.list
-
-echo deb http://deb.debian.org/debian/ buster-updates main contrib non-free >> /etc/apt/sources.list
-echo deb-src http://deb.debian.org/debian/ buster-updates main >> /etc/apt/sources.list
-
-echo deb http://deb.debian.org/debian buster-backports main >> /etc/apt/sources.list
+log() {
+  printf '[INFO] %s\n' "$*"
 }
 
-#2- CREATE AN UPDATE SCRIPT
-
-updates () {
-
-touch /bin/update
-echo "apt -y clean" > /bin/update                        # REMOVE UPDATE DB
-echo "apt -y autoclean" >> cat /bin/update               # REMOVE NOT UNUSED PACKAGES
-echo "apt -y autoremove" >>  /bin/update                 # REMOVE DEB INSTALL FILES
-echo "apt update" >> /bin/update                         # UPDATE LATEST PKG
-echo "apt -y upgrade" >> /bin/update                     # UPGRADE PKG
-echo "apt -y dist-upgrade" >> /bin/update                # UPGRADE DISTRIBUTION
-echo "logrotate -vf /etc/logrotate.conf" >> /bin/update  # Force Rotate logs
-chmod +x /bin/update
-sh /bin/./update
+warn() {
+  printf '[WARN] %s\n' "$*" >&2
 }
 
-#3- INSTALL FIRMWARE AND MICROCODE
-
-firmware () {
-
-apt -y install firmware-misc-nonfree
-apt -y install intel-microcode
-apt -y install iucode-tool
-apt -y install ttf-mscorefonts-installer rar unrar libavcodec-extra gstreamer1.0-libav gstreamer1.0-plugins-ugly gstreamer1.0-vaapi
+die() {
+  printf '[ERROR] %s\n' "$*" >&2
+  exit 1
 }
 
-#4- CLI SOFTWARE
-
-cli_install () {
-
-apt -y install build-essential cmake                                   # DEVELOPMENT TOOLS
-apt -y install p7zip p7zip-full unrar-free unzip                       # FILE ARCHIVERS
-apt -y install htop lshw wget locate curl htop net-tools rsync cssh    # UTILITIES
-apt -y install tmux                                                    # TERMINAL MULTIPLEXER
-apt -y install nano                                                    # TEXT EDITORS
-apt -y install git                                                     # VCS
-apt -y install okular                                                  # PDF MANIPULATION
-apt -y install ffmpeg                                                  # VIDEO MANIPULATION
-apt -y install default-jdk                                             # JAVA DEVELOPMENT KIT (JDK)
-apt -y install wavemon                                                 # NET ONLY FOR Wireless
-apt -y install speetest-CLI                                            # Speed test tool
+on_error() {
+  local line="$1"
+  die "Command failed at line ${line}."
 }
 
-#5- GUI SOFTWARE
+trap 'on_error $LINENO' ERR
 
-gui_install () {
-
-apt -y install gparted                                                 # PARTITION TOOL
-apt -y install gvfs-backends ntfs-3g                                   # USERSPACE VIRTUAL FILESYSTEM
-apt -y install xarchiver                                               # FILE ARCHIVER FRONTEND
-apt -y install galculator                                              # SCIENTIFIC CALCULATOR
-apt -y install vlc                                                     # VIDEO AND AUDIO PLAYER
-apt -y install mpv                                                     # VIDEO AND AUDIO PLAYER
-apt -y install blender imagemagick inkscape                            # GRAPHICS EDITORS
-apt -y install gimp gimp-data gimp-plugin-registry gimp-data-extras -y # GIMP WTH EXTRAS
-apt -y install audacity                                                # AUDIO EDITOR
-apt -y install openshot                                                # VIDEO EDITOR
-apt -y install filezilla                                               # FTP/FTPS/SFTP CLIENT
-apt -y install libreoffice                                             # OFFICE (optional, not last version)
-apt -y install firefox
-apt -y install kazam                                                   # SCREENCAST (optional)
-apt -y lshw                                                            # Information about hardware configuration 
+require_root() {
+  if [[ "${EUID}" -ne 0 ]]; then
+    die "Run this script as root (for example: sudo ./${SCRIPT_NAME})."
+  fi
 }
 
-#6- INSTALL .DEB PACKAGES
-
-deb_install () {
-
-apt install software-properties-common apt-transport-HTTP curl
-curl -SSL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
-add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main"
-apt update sudo apt install code
+require_cmd() {
+  local cmd="$1"
+  command -v "$cmd" >/dev/null 2>&1 || die "Required command not found: ${cmd}"
 }
 
-#7- INSTALL VIDEO DRIVERS
-
-gpu_drivers () {
-
-#Determine if we have nvidia or amd
-
-video = $(lshw -numeric -C display | grep vendor)
-
-if [ "$video" == "nvidia" ];
-    add-apt-repository ppa:graphics-drivers/ppa -y
-    apt update
-    apt install nvidia-driver
-elif [ "$1" == "amd" ]; then
-    add-apt-repository ppa:oibaf/graphics-drivers -y
-    apt update
-    apt install amdgpu-pro
-fi
-#need to catch exception
+confirm() {
+  local prompt="$1"
+  local answer
+  read -r -p "${prompt} [y/N]: " answer
+  [[ "$answer" =~ ^[Yy]$ ]]
 }
 
-#8- FIREWALL
+detect_os() {
+  [[ -r /etc/os-release ]] || die "/etc/os-release is missing."
+  # shellcheck disable=SC1091
+  . /etc/os-release
 
-firewall () {
-apt -y install ufw; systemctl start ufw; systemctl enable ufw;; # Firewall
+  DISTRO_ID="${ID:-unknown}"
+  DISTRO_VERSION_ID="${VERSION_ID:-unknown}"
+  DISTRO_CODENAME="${VERSION_CODENAME:-}"
+
+  if [[ -z "${DISTRO_CODENAME}" ]] && command -v lsb_release >/dev/null 2>&1; then
+    DISTRO_CODENAME="$(lsb_release -sc)"
+  fi
+
+  if [[ -z "${DISTRO_CODENAME}" ]]; then
+    die "Could not detect distro codename."
+  fi
+
+  log "Detected ${DISTRO_ID} ${DISTRO_VERSION_ID} (${DISTRO_CODENAME})."
 }
 
-#9- LAPTOP
-
-laptop () {
-apt -y install tlp; systemctl start tlp; systemctl enable tlp;; # batt saver
+apt_update() {
+  DEBIAN_FRONTEND=noninteractive apt-get update
 }
 
-#10- TWEAKS
-
-tweaks () {
-echo /etc/sysctl.conf >> vm.swappiness=10                               # Set swappiness
-
-## need to find drive name
-#hdparm -W 1 /dev/sda                                                   # SET DISK CACHE ON
-
-##remove time stamp on fstab
-
-# /etc/fstab add noatime after ro
-
-##set grub  ***Need to make a backup of grub before mods******
-
-#nano /etc/default/grub
-
-#GRUB_TIMEOUT to 0
-
-#update-grub
+apt_upgrade() {
+  DEBIAN_FRONTEND=noninteractive apt-get full-upgrade -y
 }
 
-PS3='Make your selection: '
-foods=("Add_Repo" "Updates" "Firmware" "CLI_Soft" "GUI_Soft" "DEB_pkg" "GPU_Drivers" "Firewall" "Laptop" "Tweaks" "Quit")
-select fav in "${foods[@]}"; do
-    case $fav in
-        "Add_Repo")
-            echo "$fav: adds repos from debian contrib non-free"
-            # optionally call a function or run some code here
-            echo "Proceed y/n ?"
-            read ans
-                if [[ $ans == y* ]]; then
-                    add_repo
-                else
-                    echo "Exiting..."
-                fi
-            break
-            add_repo 
-            ;;
-        "Updates")
-            echo "$fav: will create an update script called update you can call from any terminal"
-            # optionally call a function or run some code here
-            echo "Proceed y/n ?"
-            read ans
-                if [[ $ans == y* ]]; then
-                    updates
-                else
-                    echo "Exiting..."
-                fi
-            break
-            ;;
-        "Firmware")
-            echo "$fav: install firmware needed"
-            # optionally call a function or run some code here
-            echo "Proceed y/n ?"
-            read ans
-                if [[ $ans == y* ]]; then
-                    firmware
-                else
-                    echo "Exiting..."
-                fi
-            break
-            ;;
-        "CLI_Soft")
-            echo "$fav: install terminal essential apps"
-            # optionally call a function or run some code here
-            echo "Proceed y/n ?"
-            read ans
-                if [[ $ans == y* ]]; then
-                    cli_install
-                else
-                    echo "Exiting..."
-                fi
-            break
-            ;;
-        "GUI_Soft")
-            echo "$fav: install graphical essential apps"
-            # optionally call a function or run some code here
-            echo "Proceed y/n ?"
-            read ans
-                if [[ $ans == y* ]]; then
-                    gui_install
-                else
-                    echo "Exiting..."
-                fi
-            break
-            ;;
-        "DEB_pkg")
-            echo "$fav: install debian pkg needed"
-            # optionally call a function or run some code here
-            echo "Proceed y/n ?"
-            read ans
-                if [[ $ans == y* ]]; then
-                    deb_install
-                else
-                    echo "Exiting..."
-                fi
-            break
-            ;;
-        "GPU_Drivers")
-            echo "$fav: install GPU drivers nvidia/amd"
-            # optionally call a function or run some code here
-             echo "Proceed y/n ?"
-            read ans
-                if [[ $ans == y* ]]; then
-                    gpu_drivers
-                else
-                    echo "Exiting..."
-                fi
-            break
-            ;;
-        "Firewall")
-            echo "$fav: install firewall and activates it"
-            # optionally call a function or run some code here
-            echo "Proceed y/n ?"
-            read ans
-                if [[ $ans == y* ]]; then
-                    firewall
-                else
-                    echo "Exiting..."
-                fi
-            break
-            ;;
-        "Laptop")
-            echo "$fav: install battery saver"
-            # optionally call a function or run some code here
-            echo "Proceed y/n ?"
-            read ans
-                if [[ $ans == y* ]]; then
-                    laptop
-                else
-                    echo "Exiting..."
-                fi
-            break
-            ;;
-         "Tweaks")
-            echo "$fav: install a couple of tweaks to speed up your computer"
-            # optionally call a function or run some code here
-            echo "Proceed y/n ?"
-            read ans
-                if [[ $ans == y* ]]; then
-                    xxxxx
-                else
-                    echo "Exiting..."
-                fi
-            break
-            ;;
-        "Quit")
-            echo "User requested exit"
-            exit
-            ;;
-        *) echo "invalid option $REPLY";;
+apt_install() {
+  if [[ "$#" -eq 0 ]]; then
+    return 0
+  fi
+  DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends "$@"
+}
 
+install_first_available() {
+  local pkg
+  for pkg in "$@"; do
+    if apt-cache show "$pkg" >/dev/null 2>&1; then
+      apt_install "$pkg"
+      return 0
+    fi
+  done
+  warn "None of these packages were available: $*"
+  return 1
+}
 
-esac
-done
+backup_file() {
+  local file="$1"
+  if [[ -f "$file" ]]; then
+    local backup="${file}.bak.$(date +%Y%m%d-%H%M%S)"
+    cp -a "$file" "$backup"
+    log "Backed up ${file} -> ${backup}"
+  fi
+}
+
+add_repo() {
+  detect_os
+  if [[ "${DISTRO_ID}" != "debian" ]]; then
+    die "This repo setup only supports Debian. Detected: ${DISTRO_ID}."
+  fi
+
+  backup_file "/etc/apt/sources.list"
+
+  cat >/etc/apt/sources.list <<EOF
+# Managed by ${SCRIPT_NAME}
+deb http://deb.debian.org/debian ${DISTRO_CODENAME} main contrib non-free non-free-firmware
+deb-src http://deb.debian.org/debian ${DISTRO_CODENAME} main contrib non-free non-free-firmware
+
+deb http://deb.debian.org/debian ${DISTRO_CODENAME}-updates main contrib non-free non-free-firmware
+deb-src http://deb.debian.org/debian ${DISTRO_CODENAME}-updates main contrib non-free non-free-firmware
+
+deb http://security.debian.org/debian-security ${DISTRO_CODENAME}-security main contrib non-free non-free-firmware
+deb-src http://security.debian.org/debian-security ${DISTRO_CODENAME}-security main contrib non-free non-free-firmware
+
+deb http://deb.debian.org/debian ${DISTRO_CODENAME}-backports main contrib non-free non-free-firmware
+EOF
+
+  apt_update
+  log "Debian repositories updated for ${DISTRO_CODENAME}."
+}
+
+create_update_helper() {
+  cat >"${UPDATE_HELPER}" <<'EOF'
+#!/usr/bin/env bash
+set -Eeuo pipefail
+export DEBIAN_FRONTEND=noninteractive
+apt-get update
+apt-get full-upgrade -y
+apt-get autoremove -y
+apt-get autoclean -y
+EOF
+  chmod 0755 "${UPDATE_HELPER}"
+  log "Created update helper at ${UPDATE_HELPER}."
+}
+
+update_system() {
+  apt_update
+  apt_upgrade
+  DEBIAN_FRONTEND=noninteractive apt-get autoremove -y
+  DEBIAN_FRONTEND=noninteractive apt-get autoclean -y
+  log "System update completed."
+}
+
+firmware() {
+  detect_os
+  if [[ "${DISTRO_ID}" != "debian" ]]; then
+    warn "Firmware list is tuned for Debian and may be partial on ${DISTRO_ID}."
+  fi
+
+  apt_install firmware-linux firmware-misc-nonfree iucode-tool
+
+  if grep -qi intel /proc/cpuinfo; then
+    apt_install intel-microcode
+  elif grep -qi amd /proc/cpuinfo; then
+    apt_install amd64-microcode
+  else
+    warn "Unknown CPU vendor; skipping microcode package selection."
+  fi
+
+  apt_install fonts-crosextra-carlito fonts-crosextra-caladea
+  apt_install rar unrar ffmpeg gstreamer1.0-libav gstreamer1.0-plugins-ugly gstreamer1.0-vaapi
+}
+
+cli_install() {
+  apt_install build-essential cmake git tmux nano curl wget rsync htop lshw pciutils usbutils
+  apt_install unzip zip p7zip-full
+  install_first_available fd-find fd || true
+  install_first_available ripgrep rg || true
+  install_first_available speedtest-cli || true
+  apt_install net-tools dnsutils traceroute
+}
+
+gui_install() {
+  apt_install gparted gvfs-backends ntfs-3g xarchiver galculator vlc mpv
+  apt_install blender imagemagick inkscape gimp audacity filezilla libreoffice
+  apt_install firefox-esr
+  install_first_available openshot-qt openshot || true
+}
+
+install_vscode_repo() {
+  require_cmd curl
+  require_cmd gpg
+
+  apt_install ca-certificates curl gpg
+  install -d -m 0755 /etc/apt/keyrings
+
+  curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /etc/apt/keyrings/microsoft.gpg
+  chmod 0644 /etc/apt/keyrings/microsoft.gpg
+
+  cat >/etc/apt/sources.list.d/vscode.list <<'EOF'
+deb [arch=amd64 signed-by=/etc/apt/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/code stable main
+EOF
+
+  apt_update
+  apt_install code
+}
+
+gpu_drivers() {
+  require_cmd lspci
+
+  local gpu_info
+  gpu_info="$(lspci -nn | grep -Ei 'vga|3d|display' || true)"
+
+  if echo "$gpu_info" | grep -qi nvidia; then
+    log "NVIDIA GPU detected. Installing Debian-packaged NVIDIA driver."
+    apt_install nvidia-driver firmware-misc-nonfree
+  elif echo "$gpu_info" | grep -qi amd; then
+    log "AMD GPU detected. Installing open-source AMD graphics stack."
+    apt_install firmware-amd-graphics mesa-vulkan-drivers mesa-va-drivers
+  elif echo "$gpu_info" | grep -Eqi 'intel|arc'; then
+    log "Intel GPU detected. Installing Intel media and Vulkan stack."
+    apt_install intel-media-va-driver-non-free mesa-vulkan-drivers
+  else
+    warn "No supported GPU vendor detected automatically."
+  fi
+}
+
+firewall() {
+  apt_install ufw
+  ufw --force enable
+  systemctl enable --now ufw
+  if systemctl is-enabled --quiet ssh || systemctl is-enabled --quiet sshd; then
+    ufw allow OpenSSH || true
+  fi
+  log "Firewall enabled with UFW."
+}
+
+laptop() {
+  apt_install tlp
+  systemctl enable --now tlp
+  log "TLP enabled."
+}
+
+tweaks() {
+  cat >/etc/sysctl.d/99-postinstall.conf <<'EOF'
+# Managed by debian-post-install.sh
+vm.swappiness=10
+EOF
+  sysctl --system >/dev/null
+  log "Applied swappiness tweak (vm.swappiness=10)."
+}
+
+menu() {
+  local options=(
+    "Add_Repo"
+    "Update_System"
+    "Create_Update_Helper"
+    "Firmware"
+    "CLI_Soft"
+    "GUI_Soft"
+    "Install_VSCode"
+    "GPU_Drivers"
+    "Firewall"
+    "Laptop"
+    "Tweaks"
+    "All_Common"
+    "Quit"
+  )
+
+  PS3='Make your selection: '
+  select selection in "${options[@]}"; do
+    case "$selection" in
+      "Add_Repo")
+        confirm "Replace /etc/apt/sources.list with detected Debian ${DISTRO_CODENAME:-<auto>} repos?" && add_repo
+        ;;
+      "Update_System")
+        confirm "Run full system update now?" && update_system
+        ;;
+      "Create_Update_Helper")
+        confirm "Create ${UPDATE_HELPER}?" && create_update_helper
+        ;;
+      "Firmware")
+        confirm "Install firmware and microcode packages?" && firmware
+        ;;
+      "CLI_Soft")
+        confirm "Install CLI packages?" && cli_install
+        ;;
+      "GUI_Soft")
+        confirm "Install GUI packages?" && gui_install
+        ;;
+      "Install_VSCode")
+        confirm "Add Microsoft repo and install VS Code?" && install_vscode_repo
+        ;;
+      "GPU_Drivers")
+        confirm "Auto-detect GPU and install matching drivers?" && gpu_drivers
+        ;;
+      "Firewall")
+        confirm "Install and enable UFW firewall?" && firewall
+        ;;
+      "Laptop")
+        confirm "Install and enable TLP?" && laptop
+        ;;
+      "Tweaks")
+        confirm "Apply sysctl tweaks?" && tweaks
+        ;;
+      "All_Common")
+        if confirm "Run common baseline steps (update, firmware, CLI, GUI, firewall, laptop, tweaks)?"; then
+          update_system
+          firmware
+          cli_install
+          gui_install
+          firewall
+          laptop
+          tweaks
+        fi
+        ;;
+      "Quit")
+        exit 0
+        ;;
+      *)
+        warn "Invalid option."
+        ;;
+    esac
+  done
+}
+
+main() {
+  require_root
+  detect_os
+
+  case "${1:-menu}" in
+    add_repo) add_repo ;;
+    update) update_system ;;
+    helper) create_update_helper ;;
+    firmware) firmware ;;
+    cli) cli_install ;;
+    gui) gui_install ;;
+    vscode) install_vscode_repo ;;
+    gpu) gpu_drivers ;;
+    firewall) firewall ;;
+    laptop) laptop ;;
+    tweaks) tweaks ;;
+    all)
+      update_system
+      firmware
+      cli_install
+      gui_install
+      firewall
+      laptop
+      tweaks
+      ;;
+    menu) menu ;;
+    *)
+      cat <<EOF
+Usage: ${SCRIPT_NAME} [command]
+
+Commands:
+  menu       Show interactive menu (default)
+  add_repo   Replace Debian sources.list for detected codename
+  update     Run apt update + full-upgrade + cleanup
+  helper     Create ${UPDATE_HELPER}
+  firmware   Install firmware/microcode/media packages
+  cli        Install CLI package set
+  gui        Install GUI package set
+  vscode     Add Microsoft repo and install VS Code
+  gpu        Auto-install GPU drivers by detected vendor
+  firewall   Install and enable ufw
+  laptop     Install and enable tlp
+  tweaks     Apply sysctl tweaks
+  all        Run common baseline steps
+EOF
+      exit 1
+      ;;
+  esac
+}
+
+main "$@"
